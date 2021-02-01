@@ -75,7 +75,15 @@ chd = flopy.mf6.ModflowGwfchd(
     stress_period_data=chd_rec,
     save_flows=True,
 )
+#--------------------------------------------------------------
+#The 'juegos1' starts here, trying to add a recharge. 
 
+rec= flopy.mf6.ModflowGwfrcha(
+    gwf,
+    recharge=0.001)
+
+
+#--------------------------------------------------------------
 #
 iper = 0
 ra = chd.stress_period_data.get_data(key=iper)
