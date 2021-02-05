@@ -35,7 +35,7 @@ ims = flopy.mf6.ModflowIms(sim, pname="ims", complexity="SIMPLE")
 
 #Create the Flopy groundwater flow (gwf) model object
 model_nam_file = "{}.nam".format(name)
-gwf = flopy.mf6.ModflowGwf(sim, modelname=name, model_nam_file=model_nam_file)
+gwf = flopy.mf6.ModflowGwf(sim, modelname=name, model_nam_file=model_nam_file,save_flows=True)
 
 #Se definene valores de espesor de filas y paquete de discretización.
 bot = np.linspace(-H / Nlay, -H, Nlay)
@@ -56,7 +56,7 @@ start = h1 * np.ones((Nlay, N, N))
 ic = flopy.mf6.ModflowGwfic(gwf, pname="ic", strt=start) #Initial conditions.
 
 #Not property flow - Controla flujo entre celdas.
-npf = flopy.mf6.ModflowGwfnpf(gwf, icelltype=1, k=k, save_flows=True)
+npf = flopy.mf6.ModflowGwfnpf(gwf, icelltype=1, k=k, save_flows=True,save_specific_discharge=True)
 
 #
 chd_rec = [] 
@@ -141,4 +141,13 @@ c = ax.contour(x, z, h[:, 50, :], np.arange(90, 100.1, 0.2), colors="red")
 plt.clabel(c, fmt="%1.1f")
 
 
-
+#Ploteo
+plt.show()
+head = flopy.utils.HeadFile('WorkSpace/tutorial01_mf6.hds').get_data()
+cbb = flopy.utils.CellBudgetFile('WorkSpace/tutorial01_mf6.cbb', precision='double')
+spdis = cbb.get_data(text='DATA-SPDIS')[0]
+pmv = flopy.plot.PlotMapView(gwf)
+pmv.plot_array(head)
+pmv.contour_array(head, levels=[.2, .4, .6, .8], linewidths=15.)
+pmv.plot_specific_discharge(spdis, istep=5, jstep = 5 ,color='blue')
+plt.show()
